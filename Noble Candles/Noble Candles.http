@@ -1,0 +1,6 @@
+@Noble_Candles_HostAddress = http://localhost:5212
+
+GET {{Noble_Candles_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
