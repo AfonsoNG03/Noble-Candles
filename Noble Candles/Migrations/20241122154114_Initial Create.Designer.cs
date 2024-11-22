@@ -12,7 +12,7 @@ using Noble_Candles.Models;
 namespace Noble_Candles.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241121171114_Initial Create")]
+    [Migration("20241122154114_Initial Create")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -255,6 +255,24 @@ namespace Noble_Candles.Migrations
                     b.ToTable("Reviews");
                 });
 
+            modelBuilder.Entity("Noble_Candles.Models.Role", b =>
+                {
+                    b.Property<int>("RoleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoleId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("RoleId");
+
+                    b.ToTable("Roles");
+                });
+
             modelBuilder.Entity("Noble_Candles.Models.Status", b =>
                 {
                     b.Property<int>("Id")
@@ -303,6 +321,9 @@ namespace Noble_Candles.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("VARCHAR(255)");
 
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Telemovel")
                         .HasMaxLength(50)
                         .HasColumnType("VARCHAR(50)");
@@ -311,6 +332,8 @@ namespace Noble_Candles.Migrations
                         .HasColumnType("DATETIME");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
 
                     b.ToTable("Users");
                 });
@@ -416,6 +439,17 @@ namespace Noble_Candles.Migrations
                     b.Navigation("Candle");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Noble_Candles.Models.User", b =>
+                {
+                    b.HasOne("Noble_Candles.Models.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
                 });
 #pragma warning restore 612, 618
         }

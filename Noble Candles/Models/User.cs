@@ -10,6 +10,7 @@ namespace Noble_Candles.Models
 		telemovel	VARCHAR(50)	Telemovel do utilizador
 		morada	VARCHAR(255)	Morada do utilizador.
 		email	VARCHAR(150)	Email único do utilizador.
+		role	VARCHAR(50)		Papel do utilizador.
 		password	VARCHAR(255)	Senha hash do utilizador.
 		created_at	DATETIME	Data de criação da conta.
 		updated_at	DATETIME	Data da última atualização.
@@ -17,6 +18,11 @@ namespace Noble_Candles.Models
 
 	public class User
 	{
+		public User()
+		{
+			RoleId= 1;
+		}
+
 		[Key]
 		public int Id { get; set; }
 
@@ -38,6 +44,11 @@ namespace Noble_Candles.Models
 		[Column(TypeName = "VARCHAR(150)")]
 		[EmailAddress]
 		public required string Email { get; set; }
+
+		[Required]
+		public int RoleId { get; set; }
+		public required Role Role { get; set; }
+
 
 		[Required]
 		[MaxLength(255)]
