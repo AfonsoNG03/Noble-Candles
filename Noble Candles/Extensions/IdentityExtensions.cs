@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Noble_Candles.Models;
@@ -28,19 +29,24 @@ namespace Noble_Candles.Extensions
 		//Auth = Authentication + Authorization
 		public static IServiceCollection AddIdentityAuth(this IServiceCollection services, IConfiguration config)
 		{
-			services.AddAuthentication(x =>
-			{
-				x.DefaultAuthenticateScheme =
-				x.DefaultChallengeScheme =
-				x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-			}).AddJwtBearer(Y =>
+			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+			.AddJwtBearer(Y =>
 			{
 				Y.SaveToken = false;
 				Y.TokenValidationParameters = new TokenValidationParameters
 				{
 					ValidateIssuerSigningKey = true,
-					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["AppSettings:JWTSecret"]!))
+					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["AppSettings:JWTSecret"]!)),
+					ValidateIssuer = false,
+					ValidateAudience = false,
 				};
+			});
+			services.AddAuthorization(options =>
+			{
+				options.FallbackPolicy = new AuthorizationPolicyBuilder()
+					.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+					.RequireAuthenticatedUser()
+					.Build();
 			});
 			return services;
 		}

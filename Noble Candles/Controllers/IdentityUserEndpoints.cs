@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
@@ -49,6 +50,7 @@ namespace Noble_Candles.Controllers
 			return app;
 		}
 
+		[AllowAnonymous]
 		private static async Task<IResult> CreateUser(UserManager<User> userManager, [FromBody] UserRegister userRegisterModel)
 		{
 			// Validate model
@@ -76,6 +78,7 @@ namespace Noble_Candles.Controllers
 				return Results.BadRequest(result);
 		}
 
+		[AllowAnonymous]
 		private static async Task<IResult> SignIn(UserManager<User> userManager, [FromBody] UserLogin loginModel, IOptions<AppSettings> appSettings)
 		{
 			// Validate model
