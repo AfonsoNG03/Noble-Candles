@@ -18,7 +18,7 @@ namespace Noble_Candles.Models
 		[Key]
 		public int Id { get; set; }
 
-		public required int UserId { get; set; }
+		public required string UserId { get; set; }
 		public required User User { get; set; }
 
 		[Column(TypeName = "DECIMAL(10, 2)")]

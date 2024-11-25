@@ -1,32 +1,35 @@
-using Microsoft.EntityFrameworkCore;
+using Noble_Candles.Controllers;
+using Noble_Candles.Extensions;
 using Noble_Candles.Models;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
-//Dependency Injection
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection")));
+builder.Services.AddSwaggerExplorer()
+				.InjectDbContext(builder.Configuration)
+				.AddAppConfig(builder.Configuration)
+				.AddIdentityHandlersAndStores()
+				.ConfigureIdentityOptions()	
+				.AddIdentityAuth(builder.Configuration);
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-	app.UseSwagger();
-	app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
+app.ConfigureSwaggerExplorer()
+	.ConfigureCORS(builder.Configuration)
+	.AddIdentityAuthMiddlewares();
 
 app.MapControllers();
+app.MapGroup("/api")
+	.MapIdentityApi<User>();
+app.MapGroup("/api")
+	.MapIdentityUserEndpoints();
+
+
+app.UseHttpsRedirection();
 
 app.Run();
