@@ -12,7 +12,9 @@ namespace Noble_Candles.Extensions
 
 		public static IServiceCollection AddIdentityHandlersAndStores(this IServiceCollection services)
 		{
-			services.AddIdentityApiEndpoints<User>().AddEntityFrameworkStores<ApplicationDbContext>();
+			services.AddIdentityApiEndpoints<User>()
+				.AddRoles<IdentityRole>()
+				.AddEntityFrameworkStores<ApplicationDbContext>();
 			return services;
 		}
 
@@ -41,13 +43,11 @@ namespace Noble_Candles.Extensions
 					ValidateAudience = false,
 				};
 			});
-			services.AddAuthorization(options =>
-			{
-				options.FallbackPolicy = new AuthorizationPolicyBuilder()
+			services.AddAuthorizationBuilder()
+				.SetFallbackPolicy(new AuthorizationPolicyBuilder()
 					.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
 					.RequireAuthenticatedUser()
-					.Build();
-			});
+					.Build());
 			return services;
 		}
 

@@ -14,6 +14,7 @@ namespace Noble_Candles.Models
 		public DbSet<OrderItem> OrderItems { get; set; }
 		public DbSet<Review> Reviews { get; set; }
 		public DbSet<Status> Statuses { get; set; }
+		public DbSet<Inventory> Inventory { get; set; }
 
 	}
 }

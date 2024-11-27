@@ -12,7 +12,7 @@ using Noble_Candles.Models;
 namespace Noble_Candles.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241125110629_Initial Create")]
+    [Migration("20241127122058_Initial Create")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -166,11 +166,13 @@ namespace Noble_Candles.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
+                    b.Property<string>("CategoryId")
+                        .IsRequired()
+                        .HasColumnType("VARCHAR(100)");
 
-                    b.Property<int>("ColorId")
-                        .HasColumnType("int");
+                    b.Property<string>("ColorId")
+                        .IsRequired()
+                        .HasColumnType("VARCHAR(150)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("DATETIME");
@@ -179,8 +181,9 @@ namespace Noble_Candles.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("FraganceId")
-                        .HasColumnType("int");
+                    b.Property<string>("FragranceId")
+                        .IsRequired()
+                        .HasColumnType("VARCHAR(150)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -202,47 +205,33 @@ namespace Noble_Candles.Migrations
 
                     b.HasIndex("ColorId");
 
-                    b.HasIndex("FraganceId");
+                    b.HasIndex("FragranceId");
 
                     b.ToTable("Candles");
                 });
 
             modelBuilder.Entity("Noble_Candles.Models.Category", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Name")
+                        .HasMaxLength(100)
+                        .HasColumnType("VARCHAR(100)");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("VARCHAR(100)");
-
-                    b.HasKey("Id");
+                    b.HasKey("Name");
 
                     b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("Noble_Candles.Models.Color", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("VARCHAR(150)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Name");
 
                     b.ToTable("Colors");
                 });
@@ -276,22 +265,15 @@ namespace Noble_Candles.Migrations
 
             modelBuilder.Entity("Noble_Candles.Models.Fragrance", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Name")
+                        .HasMaxLength(150)
+                        .HasColumnType("VARCHAR(150)");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("VARCHAR(150)");
-
-                    b.HasKey("Id");
+                    b.HasKey("Name");
 
                     b.ToTable("Fragrances");
                 });
@@ -441,11 +423,6 @@ namespace Noble_Candles.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -465,10 +442,6 @@ namespace Noble_Candles.Migrations
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Telemovel")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -558,9 +531,9 @@ namespace Noble_Candles.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Noble_Candles.Models.Fragrance", "Fragance")
+                    b.HasOne("Noble_Candles.Models.Fragrance", "Fragrance")
                         .WithMany()
-                        .HasForeignKey("FraganceId")
+                        .HasForeignKey("FragranceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -568,7 +541,7 @@ namespace Noble_Candles.Migrations
 
                     b.Navigation("Color");
 
-                    b.Navigation("Fragance");
+                    b.Navigation("Fragrance");
                 });
 
             modelBuilder.Entity("Noble_Candles.Models.Favorite", b =>

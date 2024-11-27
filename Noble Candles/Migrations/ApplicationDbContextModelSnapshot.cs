@@ -176,7 +176,7 @@ namespace Noble_Candles.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("FraganceId")
+                    b.Property<int>("FragranceId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -187,9 +187,6 @@ namespace Noble_Candles.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("DECIMAL(10, 2)");
 
-                    b.Property<int>("Stock")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("DATETIME");
 
@@ -199,7 +196,7 @@ namespace Noble_Candles.Migrations
 
                     b.HasIndex("ColorId");
 
-                    b.HasIndex("FraganceId");
+                    b.HasIndex("FragranceId");
 
                     b.ToTable("Candles");
                 });
@@ -291,6 +288,30 @@ namespace Noble_Candles.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Fragrances");
+                });
+
+            modelBuilder.Entity("Noble_Candles.Models.Inventory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CandleId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LastUpdatedAt")
+                        .HasColumnType("DATETIME");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandleId");
+
+                    b.ToTable("Inventory");
                 });
 
             modelBuilder.Entity("Noble_Candles.Models.Order", b =>
@@ -546,9 +567,9 @@ namespace Noble_Candles.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Noble_Candles.Models.Fragrance", "Fragance")
+                    b.HasOne("Noble_Candles.Models.Fragrance", "Fragrance")
                         .WithMany()
-                        .HasForeignKey("FraganceId")
+                        .HasForeignKey("FragranceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -556,7 +577,7 @@ namespace Noble_Candles.Migrations
 
                     b.Navigation("Color");
 
-                    b.Navigation("Fragance");
+                    b.Navigation("Fragrance");
                 });
 
             modelBuilder.Entity("Noble_Candles.Models.Favorite", b =>
@@ -576,6 +597,17 @@ namespace Noble_Candles.Migrations
                     b.Navigation("Candle");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Noble_Candles.Models.Inventory", b =>
+                {
+                    b.HasOne("Noble_Candles.Models.Candle", "Candle")
+                        .WithMany()
+                        .HasForeignKey("CandleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Candle");
                 });
 
             modelBuilder.Entity("Noble_Candles.Models.Order", b =>

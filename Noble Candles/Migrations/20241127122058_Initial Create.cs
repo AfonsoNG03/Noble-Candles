@@ -30,8 +30,6 @@ namespace Noble_Candles.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Telemovel = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Morada = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "DATETIME", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "DATETIME", nullable: false),
@@ -59,41 +57,35 @@ namespace Noble_Candles.Migrations
                 name: "Categories",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "VARCHAR(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Categories", x => x.Id);
+                    table.PrimaryKey("PK_Categories", x => x.Name);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Colors",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "VARCHAR(150)", maxLength: 150, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Colors", x => x.Id);
+                    table.PrimaryKey("PK_Colors", x => x.Name);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Fragrances",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "VARCHAR(150)", maxLength: 150, nullable: false),
                     Description = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Fragrances", x => x.Id);
+                    table.PrimaryKey("PK_Fragrances", x => x.Name);
                 });
 
             migrationBuilder.CreateTable(
@@ -225,9 +217,9 @@ namespace Noble_Candles.Migrations
                     Description = table.Column<string>(type: "TEXT", nullable: false),
                     Price = table.Column<decimal>(type: "DECIMAL(10,2)", nullable: false),
                     Stock = table.Column<int>(type: "int", nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: false),
-                    ColorId = table.Column<int>(type: "int", nullable: false),
-                    FraganceId = table.Column<int>(type: "int", nullable: false),
+                    CategoryId = table.Column<string>(type: "VARCHAR(100)", nullable: false),
+                    ColorId = table.Column<string>(type: "VARCHAR(150)", nullable: false),
+                    FragranceId = table.Column<string>(type: "VARCHAR(150)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "DATETIME", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "DATETIME", nullable: false)
                 },
@@ -238,19 +230,19 @@ namespace Noble_Candles.Migrations
                         name: "FK_Candles_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
-                        principalColumn: "Id",
+                        principalColumn: "Name",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Candles_Colors_ColorId",
                         column: x => x.ColorId,
                         principalTable: "Colors",
-                        principalColumn: "Id",
+                        principalColumn: "Name",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Candles_Fragrances_FraganceId",
-                        column: x => x.FraganceId,
+                        name: "FK_Candles_Fragrances_FragranceId",
+                        column: x => x.FragranceId,
                         principalTable: "Fragrances",
-                        principalColumn: "Id",
+                        principalColumn: "Name",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -417,9 +409,9 @@ namespace Noble_Candles.Migrations
                 column: "ColorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Candles_FraganceId",
+                name: "IX_Candles_FragranceId",
                 table: "Candles",
-                column: "FraganceId");
+                column: "FragranceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Favorites_CandleId",

@@ -18,7 +18,7 @@ namespace Noble_Candles.Controllers
 		[Authorize]
 		private static async Task<IResult> GetUserProfile(ClaimsPrincipal user, UserManager<User> userManager)
 		{
-			string? userID = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+			string? userID = user.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
 			if (userID == null)
 			{
 				throw new ArgumentNullException(nameof(userID), "User ID cannot be null");

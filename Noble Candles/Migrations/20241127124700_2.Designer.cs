@@ -12,8 +12,8 @@ using Noble_Candles.Models;
 namespace Noble_Candles.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241125111021_UpdateToIdentity2")]
-    partial class UpdateToIdentity2
+    [Migration("20241127124700_2")]
+    partial class _2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -179,7 +179,7 @@ namespace Noble_Candles.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("FraganceId")
+                    b.Property<int>("FragranceId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -202,7 +202,7 @@ namespace Noble_Candles.Migrations
 
                     b.HasIndex("ColorId");
 
-                    b.HasIndex("FraganceId");
+                    b.HasIndex("FragranceId");
 
                     b.ToTable("Candles");
                 });
@@ -549,9 +549,9 @@ namespace Noble_Candles.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Noble_Candles.Models.Fragrance", "Fragance")
+                    b.HasOne("Noble_Candles.Models.Fragrance", "Fragrance")
                         .WithMany()
-                        .HasForeignKey("FraganceId")
+                        .HasForeignKey("FragranceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -559,7 +559,7 @@ namespace Noble_Candles.Migrations
 
                     b.Navigation("Color");
 
-                    b.Navigation("Fragance");
+                    b.Navigation("Fragrance");
                 });
 
             modelBuilder.Entity("Noble_Candles.Models.Favorite", b =>

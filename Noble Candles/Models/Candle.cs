@@ -35,19 +35,16 @@ namespace Noble_Candles.Models
 		public required decimal Price { get; set; }
 
 		[Required]
-		public required int Stock { get; set; }
-
-		[Required]
 		public required int CategoryId { get; set; }
-		public required Category Category { get; set; }
+		public Category Category { get; set; }
 
 		[Required]
 		public required int ColorId { get; set; }
-		public required Color Color { get; set; }
+		public Color Color { get; set; }
 
 		[Required]
-		public required int FraganceId { get; set; }
-		public required Fragrance Fragance { get; set; }
+		public required int FragranceId { get; set; }
+		public Fragrance Fragrance { get; set; }
 
 		[Column(TypeName = "DATETIME")]
 		public DateTime CreatedAt { get; set; } = DateTime.Now;

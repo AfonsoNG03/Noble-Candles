@@ -29,6 +29,7 @@ namespace Noble_Candles.Controllers
 		public required string PhoneNumber { get; set; }
 		[Required]
 		public required string UserName { get; set; }
+
 	}
 
 	public class UserLogin
@@ -71,6 +72,7 @@ namespace Noble_Candles.Controllers
 				PhoneNumber = userRegisterModel.PhoneNumber
 			};
 			var result = await userManager.CreateAsync(user, userRegisterModel.Password);
+			await userManager.AddToRoleAsync(user, "User");
 
 			if (result.Succeeded)
 				return Results.Ok(result);
@@ -94,13 +96,19 @@ namespace Noble_Candles.Controllers
 
 			if (user != null && await userManager.CheckPasswordAsync(user, loginModel.Password))
 			{
+				var roles = await userManager.GetRolesAsync(user);
 				var SignInKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.Value.JWTSecret));
+
+				ClaimsIdentity claims = new ClaimsIdentity(new Claim[]
+				{
+					new Claim("UserID", user.Id.ToString()),
+					new Claim("UserName", user.UserName!.ToString()),
+					new Claim(ClaimTypes.Role, roles.First())
+				});
+
 				var tokenDescriptor = new SecurityTokenDescriptor
 				{
-					Subject = new ClaimsIdentity(new Claim[]
-					{
-						new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
-					}),
+					Subject = claims,
 					Expires = DateTime.UtcNow.AddMinutes(60),
 					SigningCredentials = new SigningCredentials(SignInKey, SecurityAlgorithms.HmacSha256Signature)
 				};
