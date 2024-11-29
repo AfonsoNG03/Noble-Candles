@@ -17,10 +17,10 @@ namespace Noble_Candles.Models
 		public int Id { get; set; }
 
 		public required int OrderId { get; set; }
-		public required Order Order { get; set; }
+		public Order Order { get; set; }
 
 		public required int CandleId { get; set; }
-		public required Candle Candle { get; set; }
+		public Candle Candle { get; set; }
 
 		[Required]
 		public required int Quantity { get; set; }

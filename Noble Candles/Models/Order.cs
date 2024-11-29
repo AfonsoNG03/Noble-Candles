@@ -19,13 +19,13 @@ namespace Noble_Candles.Models
 		public int Id { get; set; }
 
 		public required string UserId { get; set; }
-		public required User User { get; set; }
+		public User User { get; set; }
 
 		[Column(TypeName = "DECIMAL(10, 2)")]
 		public required decimal TotalPrice { get; set; }
 
 		public required int StatusId { get; set; }
-		public required Status Status { get; set; }
+		public Status Status { get; set; }
 
 		[Column(TypeName = "DATETIME")]
 		public DateTime CreatedAt { get; set; } = DateTime.Now;

@@ -25,12 +25,19 @@ app.ConfigureSwaggerExplorer()
 
 app.MapControllers();
 app.MapGroup("/api")
-	.MapIdentityApi<User>();
-app.MapGroup("/api")
 	.MapIdentityUserEndpoints()
 	.MapAccountEndpoints()
-	.MapAuthorizationDemoEndpoints()
-	.MapCandlesEndpoints();
+	.MapCandlesEndpoints()
+	.MapCategoriesEndpoints()
+	.MapColorsEndpoints()
+	.MapFavoritesEndpoints()
+	.MapFragrancesEndpoints()
+	.MapInventoriesEndpoints()
+	.MapOrdersEndpoints()
+	.MapOrderItemsEndpoints()
+	.MapReviewsEndpoints()
+	.MapStatusesEndpoints();
+	
 
 
 app.UseHttpsRedirection();

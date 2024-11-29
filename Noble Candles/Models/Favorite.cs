@@ -17,10 +17,10 @@ namespace Noble_Candles.Models
 		public int Id { get; set; }
 
 		public required string UserId { get; set; }
-		public required User User { get; set; }
+		public User User { get; set; }
 
 		public required int CandleId { get; set; }
-		public required Candle Candle { get; set; }
+		public Candle Candle { get; set; }
 
 		[Column(TypeName = "DATETIME")]
 		public DateTime CreatedAt { get; set; } = DateTime.Now;

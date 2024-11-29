@@ -164,6 +164,14 @@ namespace Noble_Candles.Controllers
 			dbContext.Candles.Add(newCandle);
 			await dbContext.SaveChangesAsync();
 
+			var inventory = new Inventory
+			{
+				CandleId = newCandle.Id,
+				Quantity = 0
+			};
+			dbContext.Inventory.Add(inventory);
+			await dbContext.SaveChangesAsync();
+
 			return Results.Created($"/Candles/{newCandle.Id}", newCandle);
 		}
 
@@ -175,6 +183,13 @@ namespace Noble_Candles.Controllers
 			{
 				dbContext.Candles.Remove(candle);
 				await dbContext.SaveChangesAsync();
+
+				var inventory = await dbContext.Inventory.Where(i => i.CandleId == id).FirstOrDefaultAsync();
+				if (inventory != null) {
+					dbContext.Inventory.Remove(inventory);
+					await dbContext.SaveChangesAsync();
+				}
+
 				return Results.NoContent();
 			}
 			else
