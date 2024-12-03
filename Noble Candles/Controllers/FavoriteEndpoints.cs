@@ -17,13 +17,13 @@ namespace Noble_Candles.Controllers
 			app.MapGet("/Favorites", GetFavorites);
 
 			//Favorites by user
-			app.MapGet("/Favorites/User/{user}", GetFavoritesByUser);
+			app.MapGet("/Favorites/User", GetFavoritesByUser);
 
 			//Favorites by candle
 			app.MapGet("/Favorites/Candle/{candle}", GetFavoritesByCandle);
 
 			//Create Favorite
-			app.MapPost("/Favorites/Create", CreateFavorite);
+			app.MapPost("/Favorites/Create/{candleId}", CreateFavorite);
 
 			//Delete Favorite
 			app.MapDelete("/Favorites/Delete/{id}", DeleteFavorite);
@@ -49,14 +49,14 @@ namespace Noble_Candles.Controllers
 		private static async Task<IResult> GetFavoritesByUser([FromServices] ApplicationDbContext dbContext, ClaimsPrincipal user)
 		{
 			// Extract the currently logged-in user's ID
-			var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-			if (userId == null)
+			string? userID = user.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+			if (userID == null)
 			{
 				return Results.Unauthorized();
 			}
 
 			// Fetch only the logged-in user's favorites
-			var favorites = await dbContext.Favorites.Where(f => f.UserId == userId).ToListAsync();
+			var favorites = await dbContext.Favorites.Where(f => f.UserId == userID).ToListAsync();
 			if (favorites.Count == 0)
 			{
 				return Results.NotFound("No favorites found.");
@@ -80,11 +80,11 @@ namespace Noble_Candles.Controllers
 			}
 		}
 
-		private static async Task<IResult> CreateFavorite([FromServices] ApplicationDbContext dbContext, [FromBody] int candleId, ClaimsPrincipal user)
+		private static async Task<IResult> CreateFavorite([FromServices] ApplicationDbContext dbContext, int candleId, ClaimsPrincipal user)
 		{
 			// Extract the currently logged-in user's ID
-			var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-			if (userId == null)
+			string? userID = user.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+			if (userID == null)
 			{
 				return Results.Unauthorized();
 			}
@@ -98,7 +98,7 @@ namespace Noble_Candles.Controllers
 
 			// Check if the favorite already exists
 			var existingFavorite = await dbContext.Favorites
-				.FirstOrDefaultAsync(f => f.UserId == userId && f.CandleId == candleId);
+				.FirstOrDefaultAsync(f => f.UserId == userID && f.CandleId == candleId);
 
 			if (existingFavorite != null)
 			{
@@ -108,7 +108,7 @@ namespace Noble_Candles.Controllers
 			// Add the favorite
 			var newFavorite = new Favorite
 			{
-				UserId = userId,
+				UserId = userID,
 				CandleId = candleId,
 			};
 
@@ -122,14 +122,14 @@ namespace Noble_Candles.Controllers
 		private static async Task<IResult> DeleteFavorite([FromServices] ApplicationDbContext dbContext, int id, ClaimsPrincipal user)
 		{
 			// Extract the currently logged-in user's ID
-			var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-			if (userId == null)
+			string? userID = user.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+			if (userID == null)
 			{
 				return Results.Unauthorized();
 			}
 
 			// Find the favorite and ensure it belongs to the user
-			var favorite = await dbContext.Favorites.FirstOrDefaultAsync(f => f.Id == id && f.UserId == userId);
+			var favorite = await dbContext.Favorites.FirstOrDefaultAsync(f => f.Id == id && f.UserId == userID);
 			if (favorite == null)
 			{
 				return Results.NotFound("Favorite not found or you do not have permission to delete it.");

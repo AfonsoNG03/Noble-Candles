@@ -91,9 +91,9 @@ namespace Noble_Candles.Controllers
 		}
 
 		[AllowAnonymous]
-		private static async Task<IResult> GetCandlesByCategory([FromServices] ApplicationDbContext dbContext, string category)
+		private static async Task<IResult> GetCandlesByCategory([FromServices] ApplicationDbContext dbContext, int categoryId)
 		{
-			var candles = await dbContext.Candles.Where(c => c.Category.Name == category).ToListAsync<Candle>();
+			var candles = await dbContext.Candles.Where(c => c.Category.Id == categoryId).ToListAsync<Candle>();
 			if (candles.Count != 0)
 			{
 				return Results.Ok(candles);
@@ -105,9 +105,9 @@ namespace Noble_Candles.Controllers
 		}
 
 		[AllowAnonymous]
-		private static async Task<IResult> GetCandlesByColor([FromServices] ApplicationDbContext dbContext, string color)
+		private static async Task<IResult> GetCandlesByColor([FromServices] ApplicationDbContext dbContext, int colorId)
 		{
-			var candles = await dbContext.Candles.Where(c => c.Color.Name == color).ToListAsync<Candle>();
+			var candles = await dbContext.Candles.Where(c => c.Color.Id == colorId).ToListAsync<Candle>();
 			if (candles.Count != 0)
 			{
 				return Results.Ok(candles);
@@ -119,9 +119,9 @@ namespace Noble_Candles.Controllers
 		}
 
 		[AllowAnonymous]
-		private static async Task<IResult> GetCandlesByFragrance([FromServices] ApplicationDbContext dbContext, string fragrance)
+		private static async Task<IResult> GetCandlesByFragrance([FromServices] ApplicationDbContext dbContext, int fragranceId)
 		{
-			var candles = await dbContext.Candles.Where(c => c.Fragrance.Name == fragrance).ToListAsync<Candle>();
+			var candles = await dbContext.Candles.Where(c => c.Fragrance.Id == fragranceId).ToListAsync<Candle>();
 			if (candles.Count != 0)
 			{
 				return Results.Ok(candles);

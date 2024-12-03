@@ -93,14 +93,14 @@ namespace Noble_Candles.Controllers
 		{
 
 			// Extract the currently logged-in user's ID
-			var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-			if (userId == null)
+			string? userID = user.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+			if (userID == null)
 			{
 				return Results.Unauthorized();
 			}
 
 			var reviews = await dbContext.Reviews
-				.Where(r => r.UserId == userId)
+				.Where(r => r.UserId == userID)
 				.ToListAsync();
 
 			return reviews.Count > 0
@@ -111,15 +111,15 @@ namespace Noble_Candles.Controllers
 		private static async Task<IResult> CreateReview([FromServices] ApplicationDbContext dbContext, ReviewCreateModel reviewCreateModel, ClaimsPrincipal user)
 		{
 			// Extract the currently logged-in user's ID
-			var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-			if (userId == null)
+			string? userID = user.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+			if (userID == null)
 			{
 				return Results.Unauthorized();
 			}
 
 			// Check if the user has completed an order containing the specified candle
 			var hasPurchasedCandle = await dbContext.OrderItems
-				.AnyAsync(oi => oi.Order.UserId == userId && oi.CandleId == reviewCreateModel.CandleId && oi.Order.StatusId != 1);
+				.AnyAsync(oi => oi.Order.UserId == userID && oi.CandleId == reviewCreateModel.CandleId && oi.Order.StatusId != 1);
 
 
 			if (!hasPurchasedCandle)
@@ -130,7 +130,7 @@ namespace Noble_Candles.Controllers
 			// Create the review
 			var review = new Review
 			{
-				UserId = userId,
+				UserId = userID,
 				CandleId = reviewCreateModel.CandleId,
 				Rating = reviewCreateModel.Rating,
 				Comment = reviewCreateModel.Comment,
@@ -147,8 +147,8 @@ namespace Noble_Candles.Controllers
 		private static async Task<IResult> UpdateReview([FromServices] ApplicationDbContext dbContext, int id, ReviewCreateModel reviewCreateModel, ClaimsPrincipal user)
 		{
 			// Extract the currently logged-in user's ID
-			var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-			if (userId == null)
+			string? userID = user.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+			if (userID == null)
 			{
 				return Results.Unauthorized();
 			}
@@ -159,7 +159,7 @@ namespace Noble_Candles.Controllers
 				return Results.NotFound("Review not found.");
 			}
 
-			if (review.UserId != userId)
+			if (review.UserId != userID)
 			{
 				return Results.Unauthorized();
 			}
@@ -176,8 +176,8 @@ namespace Noble_Candles.Controllers
 		private static async Task<IResult> DeleteReview([FromServices] ApplicationDbContext dbContext, int id, ClaimsPrincipal user)
 		{
 			// Extract the currently logged-in user's ID
-			var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-			if (userId == null)
+			string? userID = user.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+			if (userID == null)
 			{
 				return Results.Unauthorized();
 			}
@@ -188,7 +188,7 @@ namespace Noble_Candles.Controllers
 				return Results.NotFound("Review not found.");
 			}
 
-			if (review.UserId != userId)
+			if (review.UserId != userID)
 			{
 				return Results.Unauthorized();
 			}

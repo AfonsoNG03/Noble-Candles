@@ -19,10 +19,6 @@ namespace Noble_Candles.Controllers
 
 	public class UpdateOrderModel
 	{
-
-		[Required]
-		public required decimal TotalPrice { get; set; }
-
 		[Required]
 		public required List<UpdateOrderItemModel> OrderItems { get; set; }
 	}
@@ -37,16 +33,11 @@ namespace Noble_Candles.Controllers
 		[Required]
 		public required int Quantity { get; set; }
 
-		[Required]
-		public required decimal Price { get; set; }
 	}
 
 
 	public class CreateOrderModel
 	{
-		[Required]
-		public required decimal TotalPrice { get; set; }
-
 		[Required]
 		public required List<CreateOrderItemModel> OrderItems { get; set; }
 	}
@@ -59,8 +50,6 @@ namespace Noble_Candles.Controllers
 		[Required]
 		public required int Quantity { get; set; }
 
-		[Required]
-		public required decimal Price { get; set; }
 	}
 
 
@@ -113,14 +102,14 @@ namespace Noble_Candles.Controllers
 		private static async Task<IResult> GetOrdersByUser([FromServices] ApplicationDbContext dbContext, ClaimsPrincipal user)
 		{
 			// Extract the currently logged-in user's ID
-			var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-			if (userId == null)
+			string? userID = user.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+			if (userID == null)
 			{
 				return Results.Unauthorized();
 			}
 
 			var orders = await dbContext.Orders
-			.Where(o => o.UserId == userId)
+			.Where(o => o.UserId == userID)
 			.Select(o => new
 			{
 				o.Id,
@@ -142,8 +131,8 @@ namespace Noble_Candles.Controllers
 		private static async Task<Object> GetOrderByUser([FromServices] ApplicationDbContext dbContext, ClaimsPrincipal user, int id)
 		{
 			// Extract the currently logged-in user's ID
-			var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-			if (userId == null)
+			string? userID = user.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+			if (userID == null)
 			{
 				return Results.Unauthorized();
 			}
@@ -192,21 +181,31 @@ namespace Noble_Candles.Controllers
 		private static async Task<IResult> CreateOrder([FromServices] ApplicationDbContext dbContext, [FromBody] CreateOrderModel createOrderModel, ClaimsPrincipal user)
 		{
 			// Extract the currently logged-in user's ID
-			var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-			if (userId == null)
+			string? userID = user.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+			if (userID == null)
 			{
 				return Results.Unauthorized();
 			}
 
 			using var transaction = await dbContext.Database.BeginTransactionAsync();
 
+			decimal totalPrice = 0;
+			foreach (var item in createOrderModel.OrderItems)
+			{
+				var candle = dbContext.Candles.Find(item.CandleId);
+				if (candle != null)
+				{
+					totalPrice += candle.Price * item.Quantity;
+				}
+			}
+
 			try
 			{
 				// Add the Order
 				var newOrder = new Order
 				{
-					UserId = userId,
-					TotalPrice = createOrderModel.TotalPrice,
+					UserId = userID,
+					TotalPrice = totalPrice,
 					StatusId = 1, // Default status is "Pending"
 				};
 
@@ -233,12 +232,17 @@ namespace Noble_Candles.Controllers
 					var inventory = inventories.First(i => i.CandleId == item.CandleId);
 					inventory.Quantity -= item.Quantity;
 
+					var candle = dbContext.Candles.Find(item.CandleId);
+					decimal price = 0;
+					if (candle != null) 
+						price = candle.Price;
+
 					dbContext.OrderItems.Add(new OrderItem
 					{
 						OrderId = newOrder.Id,
 						CandleId = item.CandleId,
 						Quantity = item.Quantity,
-						Price = item.Price
+						Price = price
 					});
 				}
 
@@ -263,9 +267,9 @@ namespace Noble_Candles.Controllers
 
 			try
 			{
-				// Get the current user's ID
-				var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-				if (userId == null)
+				// Extract the currently logged-in user's ID
+				string? userID = user.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+				if (userID == null)
 				{
 					return Results.Unauthorized();
 				}
@@ -278,7 +282,7 @@ namespace Noble_Candles.Controllers
 				}
 
 				// Ensure the order belongs to the logged-in user
-				if (order.UserId != userId)
+				if (order.UserId != userID)
 				{
 					return Results.Forbid();
 				}
@@ -314,9 +318,9 @@ namespace Noble_Candles.Controllers
 
 			using var transaction = await dbContext.Database.BeginTransactionAsync();
 
-			// Get the current user's ID
-			var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-			if (userId == null)
+			// Extract the currently logged-in user's ID
+			string? userID = user.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+			if (userID == null)
 			{
 				return Results.Unauthorized();
 			}
@@ -330,7 +334,7 @@ namespace Noble_Candles.Controllers
 					return Results.NotFound("Order not found.");
 				}
 
-				if (order.UserId != userId)
+				if (order.UserId != userID)
 				{
 					return Results.Forbid();
 				}
@@ -340,7 +344,17 @@ namespace Noble_Candles.Controllers
 					return Results.BadRequest("Only pending orders can be updated.");
 				}
 
-				order.TotalPrice = updateOrderModel.TotalPrice;
+				decimal totalPrice = 0;
+				foreach (var item in updateOrderModel.OrderItems)
+				{
+					var candle = dbContext.Candles.Find(item.CandleId);
+					if (candle != null)
+					{
+						totalPrice += candle.Price * item.Quantity;
+					}
+				}
+
+				order.TotalPrice = totalPrice;
 				order.UpdatedAt = DateTime.Now;
 
 				// Update OrderItems
@@ -357,6 +371,11 @@ namespace Noble_Candles.Controllers
 				// Handle added or updated items
 				foreach (var item in updatedOrderItems)
 				{
+					var candle = dbContext.Candles.Find(item.CandleId);
+					decimal price = 0;
+					if (candle != null)
+						price = candle.Price;
+
 					if (item.Id == 0) // New item
 					{
 						var inventory = await dbContext.Inventory.FirstOrDefaultAsync(i => i.CandleId == item.CandleId);
@@ -370,7 +389,7 @@ namespace Noble_Candles.Controllers
 							OrderId = id,
 							CandleId = item.CandleId,
 							Quantity = item.Quantity,
-							Price = item.Price
+							Price = price
 						};
 
 						dbContext.OrderItems.Add(newItem);
@@ -382,7 +401,7 @@ namespace Noble_Candles.Controllers
 						if (existingItem != null)
 						{
 							existingItem.Quantity = item.Quantity;
-							existingItem.Price = item.Price;
+							existingItem.Price = price;
 						}
 					}
 				}

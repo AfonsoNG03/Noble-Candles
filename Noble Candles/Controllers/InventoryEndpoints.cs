@@ -34,6 +34,9 @@ namespace Noble_Candles.Controllers
 			//Inventory by id
 			app.MapGet("/Inventories/{candleId}", GetInventoryInformation);
 
+			//Create Inventory
+			app.MapPost("/Inventories/Create", CreateInventory);
+
 			//Update Inventory
 			app.MapPut("/Inventories/Update", UpdateInventory);
 
@@ -68,6 +71,36 @@ namespace Noble_Candles.Controllers
 			{
 				return Results.NotFound("Inventory not found");
 			}
+		}
+
+		[Authorize(Roles = "Admin")]
+		private static async Task<IResult> CreateInventory([FromServices] ApplicationDbContext dbContext, InventoryCreateModel inventoryCreateModel)
+		{
+			// Check if the model is valid
+			if (!Validator.TryValidateObject(inventoryCreateModel, new ValidationContext(inventoryCreateModel), null, true))
+			{
+				return Results.BadRequest("Invalid data provided. Please ensure all required fields are filled in correctly.");
+			}
+
+			// Check if the inventory already exists
+			var inventory = await dbContext.Inventory.FirstOrDefaultAsync(i => i.CandleId == inventoryCreateModel.CandleId);
+
+			if (inventory != null)
+			{
+				return Results.BadRequest("Inventory already exists");
+			}
+
+			// Create the inventory
+			var newInventory = new Inventory
+			{
+				CandleId = inventoryCreateModel.CandleId,
+				Quantity = inventoryCreateModel.Quantity
+			};
+
+			await dbContext.Inventory.AddAsync(newInventory);
+			await dbContext.SaveChangesAsync();
+
+			return Results.Ok("Inventory created");
 		}
 
 		[Authorize(Roles = "Admin")]
